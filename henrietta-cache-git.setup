@@ -1,0 +1,16 @@
+;; -*- scheme -*-
+
+(compile -d1 -O3 henrietta-cache-git.scm)
+(compile -d1 -O3 henrietta-cache-update-latest-versions.scm)
+
+(define henrietta-cache-git-version "0.0.1")
+
+(install-program
+ 'henrietta-cache-git
+ '("henrietta-cache-git")
+ `((version ,henrietta-cache-git-version)))
+
+(install-program
+ 'henrietta-cache-update-latest-versions
+ '("henrietta-cache-update-latest-versions")
+ `((version ,henrietta-cache-git-version)))

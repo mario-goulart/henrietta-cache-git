@@ -1,0 +1,6 @@
+;; -*- scheme -*-
+((synopsis "A tool to convert and keep henrietta's cache in a git repository")
+ (author "Mario Domenech Goulart")
+ (category tools)
+ (license "BSD")
+ (platform unix))
