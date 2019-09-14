@@ -54,7 +54,7 @@
                   (current-output-port)))
         (this (pathname-strip-directory (program-name))))
     (fprintf port
-             "Usage: ~a <henrietta-cache dir> <henrietta-cache git dir>"
+             "Usage: ~a <henrietta-cache dir> <henrietta-cache git dir>\n"
              this)
     (when exit-code
       (exit exit-code))))
