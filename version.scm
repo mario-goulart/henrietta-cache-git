@@ -1,0 +1,25 @@
+(cond-expand
+ (chicken-5
+  (import (chicken irregex)
+          (chicken string))
+
+  ;; From setup-api (chicken-4.13.0)
+  (define (version>=? v1 v2)
+    (define (version->list v)
+      (map (lambda (x) (or (string->number x) x))
+           (irregex-split "[-\\._]" (->string v))))
+    (let loop ((p1 (version->list v1))
+               (p2 (version->list v2)))
+      (cond ((null? p1) (null? p2))
+            ((null? p2))
+            ((number? (car p1))
+             (and (number? (car p2))
+                  (or (> (car p1) (car p2))
+                      (and (= (car p1) (car p2))
+                           (loop (cdr p1) (cdr p2))))))
+            ((number? (car p2)))
+            ((string>? (car p1) (car p2)))
+            (else
+             (and (string=? (car p1) (car p2))
+                  (loop (cdr p1) (cdr p2))))))))
+ (else (void)))

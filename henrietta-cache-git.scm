@@ -1,7 +1,25 @@
 (module henrietta-cache-git ()
 
-(import chicken scheme)
-(use data-structures extras files posix setup-api srfi-1 srfi-13 utils)
+(import scheme)
+(cond-expand
+ (chicken-4
+  (import chicken scheme)
+  (use data-structures extras files posix setup-api srfi-1 srfi-13 utils))
+ (chicken-5
+  (import (chicken base)
+          (chicken condition)
+          (chicken file)
+          (chicken file posix)
+          (chicken format)
+          (chicken io)
+          (chicken pathname)
+          (chicken process)
+          (chicken process-context)
+          (chicken sort)
+          (chicken string))
+  (import srfi-1 srfi-13)
+  (include "version.scm"))
+ (else "Unsupported CHICKEN version."))
 
 (define *all-versions?* #f)
 

@@ -1,10 +1,24 @@
 (module henrietta-cache-update-latest-versions ()
 
-(import chicken scheme)
-(use data-structures extras files ports posix setup-api)
+(import scheme)
+(cond-expand
+ (chicken-4
+  (import chicken scheme)
+  (use data-structures extras files ports posix setup-api))
+ (chicken-5
+  (import (chicken base)
+          (chicken file)
+          (chicken format)
+          (chicken pathname)
+          (chicken process-context)
+          (chicken sort))
+  (include "version.scm"))
+ (else "Unsupported CHICKEN version."))
 
 ;; For setup-api's copy-file
-(run-verbose #f)
+(cond-expand
+ (chicken-4 (run-verbose #f))
+ (else (void)))
 
 (define (update-latest-versions cache-dir git-dir)
   (for-each

@@ -1,0 +1,12 @@
+;; -*- scheme -*-
+((synopsis "A tool to convert and keep henrietta's cache in a git repository")
+ (author "Mario Domenech Goulart")
+ (category tools)
+ (license "BSD")
+ (platform unix)
+ (dependencies srfi-1 srfi-13)
+ (component-options
+  (csc-options "-O3" "-d1"))
+ (components
+  (program henrietta-cache-git)
+  (program henrietta-cache-update-latest-versions)))
