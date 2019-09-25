@@ -3,13 +3,15 @@
 (import scheme)
 (cond-expand
  (chicken-4
-  (import chicken scheme)
-  (use data-structures extras files ports posix setup-api))
+  (import chicken foreign scheme)
+  (use data-structures extras files ports posix setup-api utils))
  (chicken-5
   (import (chicken base)
           (chicken file)
+          (chicken foreign)
           (chicken format)
           (chicken pathname)
+          (chicken process)
           (chicken process-context)
           (chicken sort))
   (include "version.scm"))
@@ -20,31 +22,31 @@
  (chicken-4 (run-verbose #f))
  (else (void)))
 
+(define windows-shell?
+  (foreign-value "C_WINDOWS_SHELL" bool))
+
+(define copy-command
+  (if windows-shell?
+      "copy"
+      "cp -r"))
+
+(define (copy-directory from to)
+  (system* (sprintf "~a ~a ~a" copy-command (qs from) (qs to))))
+
 (define (update-latest-versions cache-dir git-dir)
   (for-each
    (lambda (egg)
-     (let ((cache-egg-path (make-pathname cache-dir egg))
-           (git-egg-path (make-pathname git-dir egg)))
-       (if (file-exists? git-egg-path)
-           (let ((cache-egg-versions (directory cache-egg-path))
-                 (git-egg-version (car (directory git-egg-path))))
-             (for-each
-              (lambda (version)
-                (let ((git-egg-version-path (make-pathname git-egg-path
-                                                           version)))
-                  (when (and (not (file-exists? git-egg-version-path))
-                             (not (string=? git-egg-version version)) ; no version>?
-                             (version>=? version git-egg-version))
-                    (copy-file (make-pathname cache-egg-path version)
-                               git-egg-version-path))))
-              cache-egg-versions))
-           (let* ((latest-version
-                   (car (sort (directory cache-egg-path) version>=?)))
-                  (git-egg-version-path
-                   (make-pathname git-egg-path latest-version)))
-             (create-directory git-egg-version-path 'recursively)
-             (copy-file (make-pathname cache-egg-path latest-version)
-                        git-egg-version-path)))))
+     (let* ((cache-egg-path (make-pathname cache-dir egg))
+            (git-egg-path (make-pathname git-dir egg))
+            (latest-version
+             (car (sort (directory cache-egg-path) version>=?)))
+            (git-egg-version-path
+             (make-pathname git-egg-path latest-version)))
+       (unless (directory-exists? git-egg-path)
+         (create-directory git-egg-path 'recursively))
+       (unless (directory-exists? (make-pathname git-egg-path latest-version))
+         (copy-directory (make-pathname cache-egg-path latest-version)
+                         git-egg-version-path))))
    (directory cache-dir)))
 
 
