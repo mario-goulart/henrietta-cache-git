@@ -43,9 +43,12 @@
                 (if using-git
                     (handle-exceptions exn
                       (delete-directory to-remove 'recursively)
-                      (system* (sprintf "git rm -rf ~a" (qs to-remove))))
-                    (delete-directory to-remove 'recursively))
-                (set! removed (cons to-remove removed))))
+                      (begin
+                        (system* (sprintf "git rm -rf ~a 2>/dev/null" (qs to-remove)))
+                        (set! removed (cons to-remove removed))))
+                    (begin
+                      (delete-directory to-remove 'recursively)
+                      (set! removed (cons to-remove removed))))))
             versions-to-remove))))
      eggs)
     removed))
@@ -93,11 +96,11 @@
   (unless (directory-exists? ".git")
     (error 'git-update! "Directory has not been initialized."))
   (remove-inner-git-dirs!)
-  (let ((new-files (list-new-files))
-        (removed-versions ; "<egg>/<version>"
+  (let ((removed-versions ; "<egg>/<version>"
          (if *all-versions?*
              '()
-             (remove-old-versions! 'using-git))))
+             (remove-old-versions! 'using-git)))
+        (new-files (list-new-files)))
     (for-each (lambda (file)
                 (system* (sprintf "git add ~a" (qs file))))
               new-files)
