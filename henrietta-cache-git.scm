@@ -4,7 +4,7 @@
 (cond-expand
  (chicken-4
   (import chicken scheme)
-  (use data-structures extras files posix setup-api srfi-1 srfi-13 utils))
+  (use data-structures extras files posix setup-api srfi-1 utils))
  (chicken-5
   (import (chicken base)
           (chicken condition)
@@ -17,11 +17,21 @@
           (chicken process-context)
           (chicken sort)
           (chicken string))
-  (import srfi-1 srfi-13)
+  (import srfi-1)
   (include "version.scm"))
  (else "Unsupported CHICKEN version."))
 
 (define *all-versions?* #f)
+
+(define (die! fmt . args)
+  (apply fprintf
+         (cons (current-error-port)
+               (cons (string-append fmt "\n") args)))
+  (exit 1))
+
+(define (string-prefix? prefix str)
+  (let ((index (substring-index prefix str)))
+    (and index (zero? index))))
 
 (define (list-directories dir)
   (filter-map (lambda (file)
@@ -141,23 +151,33 @@ update:
 
 
 (let* ((args (command-line-arguments))
-       (non-options (remove (lambda (arg)
-                              (string-prefix? "--" arg))
-                            args)))
-  (when (or (null? non-options)
-            (null? (cdr non-options)))
+       (eggs-dir #f)
+       (command #f))
+  (let loop ((args args))
+    (unless (null? args)
+      (let ((arg (car args)))
+        (cond ((member arg '("-h" "-help" "--help"))
+               (usage 0))
+              ((equal? arg "--all-versions")
+               (set! *all-versions?* #t))
+              ((and (string-prefix? "--" arg) (not (equal? arg "--all-versions")))
+               (die! "Invalid argument: ~a" arg))
+              ((not command)
+               (set! command arg))
+              ((and command eggs-dir)
+               (die! "Invalid argument: ~a" arg))
+              (else
+               (set! eggs-dir arg)))
+        (loop (cdr args)))))
+
+  (unless (and command eggs-dir)
     (usage 1))
 
-  (set! *all-versions?* (and (member "--all-versions" args) #t))
+  (change-directory eggs-dir)
 
-  (let ((eggs-dir (cadr non-options))
-        (command (car non-options)))
-
-    (change-directory eggs-dir)
-
-    (case (string->symbol command)
-      ((initialize) (git-init!))
-      ((update) (git-update!))
-      (else (error 'main "Invalid command" command)))))
+  (case (string->symbol command)
+    ((initialize) (git-init!))
+    ((update) (git-update!))
+    (else (die! "Invalid command: ~a" command))))
 
 ) ;; end module
