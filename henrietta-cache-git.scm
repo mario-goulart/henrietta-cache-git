@@ -125,12 +125,15 @@
 Commands:
 
 initialize:
-    Initialize the git repository with the contents of <egg sources dir>,
-    respecting --all-versions.
+    Initialize a git repository in <egg sources dir>.  If --all-versions
+    is provided, then all egg versions will be added to the git repository.
 
 update:
     Update a previously initialized git repository with the changes in
-    <egg sources dir>, respecting --all-versions.
+    <egg sources dir>, respecting --all-versions.  In other words, it
+    handles the untracked files in <egg sources dir>.  If --all-versions
+    is provided, the untracked files are added to the repository.  If
+    --all-versions is not provided, the older versions are removed.
 "
              this)
     (when exit-code
