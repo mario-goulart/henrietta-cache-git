@@ -124,7 +124,7 @@
           (print "Old versions removed:")
           (for-each print removed-versions))))))
 
-(define (usage #!optional exit-code)
+(define (usage exit-code)
   (let ((port (if (and exit-code (not (zero? exit-code)))
                   (current-error-port)
                   (current-output-port)))
@@ -146,8 +146,7 @@ update:
     --all-versions is not provided, the older versions are removed.
 "
              this)
-    (when exit-code
-      (exit exit-code))))
+    (exit exit-code)))
 
 
 (let* ((args (command-line-arguments))
