@@ -50,7 +50,7 @@
    (directory cache-dir)))
 
 
-(define (usage #!optional exit-code)
+(define (usage exit-code)
   (let ((port (if (and exit-code (not (zero? exit-code)))
                   (current-error-port)
                   (current-output-port)))
@@ -58,11 +58,14 @@
     (fprintf port
              "Usage: ~a <henrietta-cache dir> <henrietta-cache git dir>\n"
              this)
-    (when exit-code
-      (exit exit-code))))
+    (exit exit-code)))
 
 
 (let ((args (command-line-arguments)))
+  (when (or (member "-h" args)
+            (member "-help" args)
+            (member "--help" args))
+    (usage 0))
   (when (or (null? args)
             (null? (cdr args)))
     (usage 1))
