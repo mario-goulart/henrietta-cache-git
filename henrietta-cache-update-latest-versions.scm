@@ -38,15 +38,17 @@
    (lambda (egg)
      (let* ((cache-egg-path (make-pathname cache-dir egg))
             (git-egg-path (make-pathname git-dir egg))
-            (latest-version
-             (car (sort (directory cache-egg-path) version>=?)))
-            (git-egg-version-path
-             (make-pathname git-egg-path latest-version)))
-       (unless (directory-exists? git-egg-path)
-         (create-directory git-egg-path 'recursively))
-       (unless (directory-exists? (make-pathname git-egg-path latest-version))
-         (copy-directory (make-pathname cache-egg-path latest-version)
-                         git-egg-version-path))))
+            (egg-versions (directory cache-egg-path)))
+       (unless (null? egg-versions)
+         (let* ((latest-version
+                 (car (sort egg-versions version>=?)))
+                (git-egg-version-path
+                 (make-pathname git-egg-path latest-version)))
+           (unless (directory-exists? git-egg-path)
+             (create-directory git-egg-path 'recursively))
+           (unless (directory-exists? (make-pathname git-egg-path latest-version))
+             (copy-directory (make-pathname cache-egg-path latest-version)
+                             git-egg-version-path))))))
    (directory cache-dir)))
 
 
