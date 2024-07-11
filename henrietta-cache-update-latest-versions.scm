@@ -5,7 +5,7 @@
  (chicken-4
   (import chicken foreign scheme)
   (use data-structures extras files ports posix setup-api utils))
- (chicken-5
+ ((or chicken-5 chicken-6)
   (import (chicken base)
           (chicken file)
           (chicken foreign)

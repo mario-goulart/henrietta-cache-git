@@ -5,7 +5,7 @@
  (chicken-4
   (import chicken scheme)
   (use data-structures extras files posix setup-api srfi-1 utils))
- (chicken-5
+ ((or chicken-5 chicken-6)
   (import (chicken base)
           (chicken condition)
           (chicken file)

@@ -1,5 +1,5 @@
 (cond-expand
- (chicken-5
+ ((or chicken-5 chicken-6)
   (import (chicken irregex)
           (chicken string))
 
